@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+
+<html lang="pt">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Formulários e Questionários — NODUS</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&amp;family=Nunito+Sans:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+<style>
+    /* ── Reset ──────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito Sans', sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #3BAEC8 0%, #2e9dba 45%, #2080a0 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── Texturas e decoração (replica NodusHero) ───────────────────── */
+    .bg-noise {
+      position: fixed; inset: 0; pointer-events: none; opacity: 0.5; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      background-size: 256px 256px;
+    }
+    .bg-radial {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background: radial-gradient(ellipse 70% 55% at 28% 22%, rgba(255,255,255,0.22) 0%, transparent 70%);
+    }
+    .circle-1 {
+      position: fixed; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.12);
+      width: 520px; height: 520px; top: -140px; right: -130px; pointer-events: none; z-index: 0;
+    }
+    .circle-2 {
+      position: fixed; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.12);
+      width: 320px; height: 320px; bottom: -80px; left: -80px;
+      opacity: 0.7; pointer-events: none; z-index: 0;
+    }
+    .circle-3 {
+      position: fixed; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.12);
+      width: 180px; height: 180px; bottom: 120px; right: 80px;
+      opacity: 0.4; pointer-events: none; z-index: 0;
+    }
+    /* corner screws */
+    .screw {
+      position: fixed; width: 22px; height: 22px; border-radius: 50%;
+      background: #2080a0; border: 2px solid rgba(255,255,255,0.55);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none; z-index: 1;
+    }
+    .screw::after {
+      content: ''; display: block;
+      width: 8px; height: 1.5px;
+      background: rgba(255,255,255,0.5); border-radius: 2px;
+    }
+    .screw-tl { top: 32px;    left: 32px;  }
+    .screw-tr { top: 32px;    right: 32px; }
+    .screw-bl { bottom: 32px; left: 32px;  }
+    .screw-br { bottom: 32px; right: 32px; }
+
+    /* ── Animações (replica NodusHero) ──────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .anim-0 { animation: fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) both; }
+    .anim-1 { animation: fadeUp 0.9s 0.15s cubic-bezier(0.22,1,0.36,1) both; }
+    .anim-2 { animation: fadeUp 0.9s 0.25s cubic-bezier(0.22,1,0.36,1) both; }
+    .anim-3 { animation: fadeUp 0.9s 0.40s cubic-bezier(0.22,1,0.36,1) both; }
+
+    /* ── Wrapper de conteúdo ─────────────────────────────────────────── */
+    .page {
+      position: relative; z-index: 2;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 24px 64px;
+      gap: 0;
+    }
+
+    /* ── Logo (SVG idêntico ao NodusHero) ───────────────────────────── */
+    .logo-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .logo-wrap svg {
+      display: block;
+      filter: drop-shadow(0 4px 18px rgba(0,0,0,0.22));
+      overflow: visible;
+    }
+
+    /* ── Título da página ────────────────────────────────────────────── */
+    .page-tagline {
+      margin-top: 16px;
+      font-family: 'Nunito Sans', sans-serif;
+      font-weight: 300;
+      font-size: 13px;
+      color: rgba(255,255,255,0.72);
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .accent-line {
+      margin-top: 16px;
+      width: 48px; height: 2px;
+      background: rgba(255,255,255,0.45);
+      border-radius: 2px;
+    }
+
+    /* ── Grelha de cards ─────────────────────────────────────────────── */
+    .grid-section {
+      margin-top: 40px;
+      width: 100%;
+      max-width: 960px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 860px)  { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px)  { .grid { grid-template-columns: 1fr; } }
+
+    /* ── Card (replica card do DashboardPage, adaptado ao fundo teal) ── */
+    .card {
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 12px;
+      padding: 20px 22px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      backdrop-filter: blur(4px);
+      transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+    }
+    .card:hover {
+      background: rgba(255,255,255,1);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      transform: translateY(-3px);
+    }
+
+    .card-title {
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+      line-height: 1.35;
+    }
+    .card-instrument {
+      font-size: 12px;
+      color: #6b7280;
+      font-family: 'Nunito Sans', sans-serif;
+      line-height: 1.45;
+    }
+    .card-spacer { flex: 1; }
+
+    /* Botão (replica fillBtn do DashboardPage) */
+    .card-btn {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 8px 18px;
+      background: linear-gradient(135deg, #3BAEC8, #2080a0);
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Nunito', sans-serif;
+      box-shadow: 0 2px 8px rgba(59,174,200,0.30);
+      transition: box-shadow 0.15s, opacity 0.15s;
+      align-self: flex-start;
+    }
+    .card-btn:hover       { box-shadow: 0 4px 16px rgba(59,174,200,0.50); opacity: 0.93; }
+    .card-btn:focus-visible { outline: 2px solid #3BAEC8; outline-offset: 3px; }
+
+    /* ── Rodapé (replica NodusHero footer) ──────────────────────────── */
+    .page-footer {
+      margin-top: 52px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.45);
+      font-family: 'Nunito Sans', sans-serif;
+      letter-spacing: 0.12em;
+      text-align: center;
+    }
+    /* ── Lock screen (mesmo registo visual da página) ───────────────── */
+    #lock {
+      position: fixed; inset: 0; z-index: 1000;
+      background: linear-gradient(135deg, #3BAEC8 0%, #2e9dba 45%, #2080a0 100%);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    #lock.hidden { display: none; }
+    .lock-card {
+      position: relative; z-index: 2;
+      width: 100%; max-width: 400px;
+      background: rgba(255,255,255,0.94);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 16px;
+      padding: 34px 30px 30px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 12px 44px rgba(0,0,0,0.22);
+      text-align: center;
+    }
+    .lock-logo { display: flex; justify-content: center; margin-bottom: 6px; }
+    .lock-logo svg { filter: drop-shadow(0 3px 12px rgba(0,0,0,0.16)); overflow: visible; }
+    .lock-tag {
+      font-family: 'Nunito Sans', sans-serif; font-weight: 300; font-size: 11px;
+      color: #2080a0; letter-spacing: 0.24em; text-transform: uppercase; margin-bottom: 22px;
+    }
+    .lock-title {
+      font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 19px;
+      color: #111827; margin-bottom: 4px;
+    }
+    .lock-sub {
+      font-family: 'Nunito Sans', sans-serif; font-size: 13px; color: #6b7280;
+      line-height: 1.5; margin-bottom: 22px;
+    }
+    .lock-input {
+      width: 100%; padding: 11px 14px; text-align: center;
+      font-family: 'Nunito Sans', sans-serif; font-size: 15px; letter-spacing: 0.06em;
+      color: #111827; background: #fff;
+      border: 1px solid #d5dbe0; border-radius: 8px; outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .lock-input:focus { border-color: #3BAEC8; box-shadow: 0 0 0 3px rgba(59,174,200,0.18); }
+    .lock-btn {
+      width: 100%; margin-top: 14px; padding: 11px 18px; cursor: pointer;
+      background: linear-gradient(135deg, #3BAEC8, #2080a0); color: #fff;
+      border: none; border-radius: 8px;
+      font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700;
+      box-shadow: 0 2px 8px rgba(59,174,200,0.30);
+      transition: box-shadow 0.15s, opacity 0.15s;
+    }
+    .lock-btn:hover { box-shadow: 0 4px 16px rgba(59,174,200,0.50); opacity: 0.94; }
+    .lock-err {
+      min-height: 18px; margin-top: 12px;
+      font-family: 'Nunito Sans', sans-serif; font-size: 12.5px; font-weight: 600; color: #c0392b;
+    }
+    .lock-foot {
+      margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(17,24,39,0.08);
+      font-family: 'Nunito Sans', sans-serif; font-size: 10.5px; color: #9aa3ab;
+      letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    .shake { animation: shk 0.4s; }
+    @keyframes shk { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+  </style>
+</head>
+<body>
+
+<div id="lock">
+  <div class="lock-card" id="lockCard">
+    <div class="lock-logo">
+      <svg aria-label="NODUS" height="52" role="img" viewbox="0 0 422.39 80" xmlns="http://www.w3.org/2000/svg">
+        <g fill="#2080a0" transform="translate(0,80) scale(0.025806,-0.025806)">
+          <path d="M0 1550 l0 -1550 125 0 124 0 -1 120 c-1 65 -5 117 -10 114 -4 -3 -8 2 -8 10 0 9 4 16 10 16 6 0 9 170 9 467 0 426 -2 468 -17 481 -14 12 -15 13 -1 9 14 -5 16 30 21 331 3 186 5 518 4 739 0 222 1 403 4 403 3 0 6 92 8 205 l4 205 -136 0 -136 0 0 -1550z"></path>
+          <path d="M2770 2904 c-117 -15 -300 -50 -393 -75 -130 -35 -135 -35 -250 -5 -114 29 -252 41 -287 23 -29 -15 -37 -42 -19 -64 8 -8 38 -27 67 -41 66 -31 60 -36 -73 -57 -54 -9 -113 -22 -131 -30 -30 -12 -54 -41 -54 -64 0 -14 53 -41 82 -41 13 -1 33 -6 46 -14 29 -15 20 -24 -59 -59 -54 -24 -99 -66 -99 -93 0 -24 27 -40 94 -53 36 -7 66 -15 66 -18 0 -3 -13 -21 -30 -40 -49 -55 -38 -76 45 -87 74 -10 124 -7 178 10 27 9 49 14 50 13 1 -2 9 -17 17 -34 14 -26 23 -31 75 -38 102 -13 153 -8 139 15 -5 7 0 9 14 6 16 -4 19 -2 15 10 -5 11 -2 14 9 9 16 -6 88 54 88 73 0 5 16 14 35 21 19 7 35 17 35 21 0 4 7 8 16 8 8 0 12 5 9 11 -4 6 -1 10 6 8 29 -3 39 2 39 21 0 13 7 20 19 20 11 0 23 5 27 11 3 6 15 9 25 6 12 -3 19 0 19 10 0 10 6 12 20 8 11 -3 20 -2 20 3 0 6 9 8 20 5 11 -3 20 -1 20 5 0 19 85 44 175 50 151 12 354 6 430 -12 82 -19 185 -64 185 -82 0 -7 -21 -36 -46 -66 -79 -92 -163 -228 -244 -393 -68 -139 -92 -199 -140 -351 -6 -17 -21 -89 -35 -160 -66 -335 -8 -659 152 -845 138 -162 310 -249 536 -271 99 -10 189 -5 322 16 67 11 277 99 295 125 3 4 21 18 40 31 76 53 146 140 199 247 24 48 47 97 51 108 4 11 15 37 24 58 9 21 16 53 16 71 0 18 3 36 7 40 8 7 10 36 17 191 4 109 -29 336 -57 391 -8 16 -15 42 -15 57 0 16 -5 41 -12 55 -19 43 -37 84 -51 122 -7 19 -19 41 -26 48 -7 7 -13 20 -13 28 0 8 -4 14 -10 14 -5 0 -10 9 -10 20 0 11 -5 20 -12 20 -9 0 -9 3 0 12 15 15 16 32 2 23 -5 -3 -10 0 -10 7 0 10 -3 9 -11 -2 -8 -12 -9 -11 -4 6 6 23 -13 76 -25 69 -6 -4 -32 39 -34 56 -1 8 -92 137 -132 188 -27 34 -34 51 -31 75 2 17 9 30 16 29 6 -2 11 4 11 12 0 8 7 15 16 15 9 0 31 8 48 19 56 33 134 46 286 46 223 0 352 -41 485 -152 248 -210 330 -601 229 -1100 -51 -251 -133 -477 -285 -783 -56 -113 -57 -115 -36 -124 23 -8 425 0 463 10 20 5 102 147 96 167 -2 5 4 17 11 26 8 9 26 48 41 86 31 82 45 114 74 175 12 25 22 57 22 72 0 15 4 29 9 32 5 4 12 25 16 49 4 23 11 47 15 52 4 6 10 24 13 40 3 17 15 64 27 105 40 142 65 333 65 495 -1 151 -10 263 -25 300 -4 11 -15 53 -24 93 -31 142 -125 341 -214 452 -77 98 -234 230 -331 279 -377 193 -905 187 -1288 -14 l-85 -44 -76 40 c-92 48 -284 110 -452 145 -106 22 -156 26 -325 29 -110 2 -216 1 -235 -1z m1125 -933 c54 -86 137 -255 164 -338 60 -181 73 -252 78 -439 5 -152 3 -190 -12 -240 -24 -83 -51 -132 -99 -182 -48 -51 -96 -78 -167 -93 -59 -13 -163 -4 -152 13 4 8 0 9 -13 4 -10 -4 -15 -4 -12 0 4 3 -7 16 -25 28 -77 52 -134 186 -143 336 -11 193 22 382 101 578 25 63 45 118 45 123 0 6 14 31 32 56 17 25 26 43 20 39 -8 -5 -10 -2 -6 9 4 9 9 13 12 10 3 -3 21 23 40 58 51 93 61 107 77 107 8 0 35 -31 60 -69z"></path>
+        </g>
+        <text fill="#2080a0" font-family="'Nunito', sans-serif" font-size="90" font-weight="900" x="155" y="70">O</text>
+        <text fill="#2080a0" font-family="'Nunito', sans-serif" font-size="90" font-weight="900" x="230" y="70">D</text>
+        <text fill="#2080a0" font-family="'Nunito', sans-serif" font-size="90" font-weight="900" x="302.5" y="70">U</text>
+        <text fill="#2080a0" font-family="'Nunito', sans-serif" font-size="90" font-weight="900" x="370" y="70">S</text>
+      </svg>
+    </div>
+    <div class="lock-tag">Formulários e Questionários</div>
+    <div class="lock-title">Acesso restrito</div>
+    <div class="lock-sub">Introduz a palavra-passe para continuar.</div>
+    <input id="pw" class="lock-input" type="password" placeholder="Palavra-passe" autocomplete="off" autofocus>
+    <button id="pwBtn" class="lock-btn">Entrar</button>
+    <div class="lock-err" id="lockErr"></div>
+    <div class="lock-foot">NODUS · Acesso privado</div>
+  </div>
+</div>
+<!-- Camadas decorativas do fundo (replica NodusHero) -->
+<div aria-hidden="true" class="bg-noise"></div>
+<div aria-hidden="true" class="bg-radial"></div>
+<div aria-hidden="true" class="circle-1"></div>
+<div aria-hidden="true" class="circle-2"></div>
+<div aria-hidden="true" class="circle-3"></div>
+<div aria-hidden="true" class="screw screw-tl"></div>
+<div aria-hidden="true" class="screw screw-tr"></div>
+<div aria-hidden="true" class="screw screw-bl"></div>
+<div aria-hidden="true" class="screw screw-br"></div>
+<div class="page">
+<!-- Logo NODUS (SVG idêntico ao NodusHero) -->
+<div aria-label="NODUS" class="logo-wrap anim-0">
+<svg aria-label="NODUS" height="88" role="img" viewbox="0 0 422.39 80" xmlns="http://www.w3.org/2000/svg">
+<g fill="white" transform="translate(0,80) scale(0.025806,-0.025806)">
+<path d="M0 1550 l0 -1550 125 0 124 0 -1 120 c-1 65 -5 117 -10 114 -4 -3 -8
+2 -8 10 0 9 4 16 10 16 6 0 9 170 9 467 0 426 -2 468 -17 481 -14 12 -15 13
+-1 9 14 -5 16 30 21 331 3 186 5 518 4 739 0 222 1 403 4 403 3 0 6 92 8 205
+l4 205 -136 0 -136 0 0 -1550z m157 278 c-3 -8 -6 -5 -6 6 -1 11 2 17 5 13 3
+-3 4 -12 1 -19z m-127 -68 c0 -5 -4 -10 -10 -10 -5 0 -10 5 -10 10 0 6 5 10
+10 10 6 0 10 -4 10 -10z m210 -70 c0 -5 -2 -10 -4 -10 -3 0 -8 5 -11 10 -3 6
+-1 10 4 10 6 0 11 -4 11 -10z m-145 -10 c3 -5 1 -10 -4 -10 -6 0 -11 5 -11 10
+0 6 2 10 4 10 3 0 8 -4 11 -10z m-68 -482 c-3 -8 -6 -5 -6 6 -1 11 2 17 5 13
+3 -3 4 -12 1 -19z m23 -538 c0 -5 -2 -10 -4 -10 -3 0 -8 5 -11 10 -3 6 -1 10
+4 10 6 0 11 -4 11 -10z"></path>
+<path d="M2770 2904 c-117 -15 -300 -50 -393 -75 -130 -35 -135 -35 -250 -5
+-114 29 -252 41 -287 23 -29 -15 -37 -42 -19 -64 8 -8 38 -27 67 -41 66 -31
+60 -36 -73 -57 -54 -9 -113 -22 -131 -30 -30 -12 -54 -41 -54 -64 0 -14 53
+-41 82 -41 13 -1 33 -6 46 -14 29 -15 20 -24 -59 -59 -54 -24 -99 -66 -99 -93
+0 -24 27 -40 94 -53 36 -7 66 -15 66 -18 0 -3 -13 -21 -30 -40 -49 -55 -38
+-76 45 -87 74 -10 124 -7 178 10 27 9 49 14 50 13 1 -2 9 -17 17 -34 14 -26
+23 -31 75 -38 102 -13 153 -8 139 15 -5 7 0 9 14 6 16 -4 19 -2 15 10 -5 11
+-2 14 9 9 16 -6 88 54 88 73 0 5 16 14 35 21 19 7 35 17 35 21 0 4 7 8 16 8 8
+0 12 5 9 11 -4 6 -1 10 6 8 29 -3 39 2 39 21 0 13 7 20 19 20 11 0 23 5 27 11
+3 6 15 9 25 6 12 -3 19 0 19 10 0 10 6 12 20 8 11 -3 20 -2 20 3 0 6 9 8 20 5
+11 -3 20 -1 20 5 0 19 85 44 175 50 151 12 354 6 430 -12 82 -19 185 -64 185
+-82 0 -7 -21 -36 -46 -66 -79 -92 -163 -228 -244 -393 -68 -139 -92 -199 -140
+-351 -6 -17 -21 -89 -35 -160 -66 -335 -8 -659 152 -845 138 -162 310 -249
+536 -271 99 -10 189 -5 322 16 67 11 277 99 295 125 3 4 21 18 40 31 76 53
+146 140 199 247 24 48 47 97 51 108 4 11 15 37 24 58 9 21 16 53 16 71 0 18 3
+36 7 40 8 7 10 36 17 191 4 109 -29 336 -57 391 -8 16 -15 42 -15 57 0 16 -5
+41 -12 55 -19 43 -37 84 -51 122 -7 19 -19 41 -26 48 -7 7 -13 20 -13 28 0 8
+-4 14 -10 14 -5 0 -10 9 -10 20 0 11 -5 20 -12 20 -9 0 -9 3 0 12 15 15 16 32
+2 23 -5 -3 -10 0 -10 7 0 10 -3 9 -11 -2 -8 -12 -9 -11 -4 6 6 23 -13 76 -25
+69 -6 -4 -32 39 -34 56 -1 8 -92 137 -132 188 -27 34 -34 51 -31 75 2 17 9 30
+16 29 6 -2 11 4 11 12 0 8 7 15 16 15 9 0 31 8 48 19 56 33 134 46 286 46 223
+0 352 -41 485 -152 248 -210 330 -601 229 -1100 -51 -251 -133 -477 -285 -783
+-56 -113 -57 -115 -36 -124 23 -8 425 0 463 10 20 5 102 147 96 167 -2 5 4 17
+11 26 8 9 26 48 41 86 31 82 45 114 74 175 12 25 22 57 22 72 0 15 4 29 9 32
+5 4 12 25 16 49 4 23 11 47 15 52 4 6 10 24 13 40 3 17 15 64 27 105 40 142
+65 333 65 495 -1 151 -10 263 -25 300 -4 11 -15 53 -24 93 -31 142 -125 341
+-214 452 -77 98 -234 230 -331 279 -377 193 -905 187 -1288 -14 l-85 -44 -76
+40 c-92 48 -284 110 -452 145 -106 22 -156 26 -325 29 -110 2 -216 1 -235 -1z
+m-710 -648 c0 -3 -4 -8 -10 -11 -5 -3 -10 -1 -10 4 0 6 5 11 10 11 6 0 10 -2
+10 -4z m1835 -285 c54 -86 137 -255 164 -338 60 -181 73 -252 78 -439 5 -152
+3 -190 -12 -240 -24 -83 -51 -132 -99 -182 -48 -51 -96 -78 -167 -93 -59 -13
+-163 -4 -152 13 4 8 0 9 -13 4 -10 -4 -15 -4 -12 0 4 3 -7 16 -25 28 -77 52
+-134 186 -143 336 -11 193 22 382 101 578 25 63 45 118 45 123 0 6 14 31 32
+56 17 25 26 43 20 39 -8 -5 -10 -2 -6 9 4 9 9 13 12 10 3 -3 21 23 40 58 51
+93 61 107 77 107 8 0 35 -31 60 -69z"></path>
+</g>
+<text fill="white" font-family="'Nunito', sans-serif" font-size="90" font-weight="900" x="155" y="70">O</text>
+<text fill="white" font-family="'Nunito', sans-serif" font-size="90" font-weight="900" x="230" y="70">D</text>
+<text fill="white" font-family="'Nunito', sans-serif" font-size="90" font-weight="900" x="302.5" y="70">U</text>
+<text fill="white" font-family="'Nunito', sans-serif" font-size="90" font-weight="900" x="370" y="70">S</text>
+</svg>
+</div>
+<!-- Tagline + linha (replica NodusHero) -->
+<p class="page-tagline anim-1">Formulários e Questionários</p>
+<div aria-hidden="true" class="accent-line anim-2"></div>
+<!-- Grelha de formulários -->
+<section aria-label="Lista de formulários" class="grid-section anim-3">
+<div class="grid" role="list">
+<!-- 1 -->
+<article class="card" role="listitem">
+<h2 class="card-title">Caderno de Registos Griffiths III</h2>
+<p class="card-instrument">Griffiths III — Escalas de Desenvolvimento Mental</p>
+<div class="card-spacer"></div>
+<!-- TODO: inserir link -->
+<a aria-label="Abrir Caderno de Registos Griffiths III" class="card-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfKJ28KPl0Z6FZ2D73CLrEdQ80G1XTBrCcP8-pxD9By8RcB_g/viewform?usp=dialog">Abrir</a>
+</article>
+<!-- 2 -->
+<article class="card" role="listitem">
+<h2 class="card-title">Escala de Avaliação de Satisfação</h2>
+<p class="card-instrument">Instrumento de avaliação da satisfação com serviços de IP</p>
+<div class="card-spacer"></div>
+<!-- TODO: inserir link -->
+<a aria-label="Abrir Escala de Avaliação de Satisfação" class="card-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScYxpeXzLB6yo9xgd9dzpVcE7b8s6zI2lPqsAC2ieVzbon8wQ/viewform?usp=dialog" rel="noopener noreferrer" target="_blank">Abrir</a>
+</article>
+<!-- 3 -->
+<article class="card" role="listitem">
+<h2 class="card-title">Escala de Stress Parental (1)</h2>
+<p class="card-instrument">PSI — Parenting Stress Index</p>
+<div class="card-spacer"></div>
+<!-- TODO: inserir link -->
+<a aria-label="Abrir Escala de Stress Parental 1" class="card-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeSpfL_wrXX_wZi8hQgadJlBapocLBj5NT2AxONO68nHUlTkQ/viewform?usp=dialog" rel="noopener noreferrer" target="_blank">Abrir</a>
+</article>
+<!-- 4 -->
+<article class="card" role="listitem">
+<h2 class="card-title">Escala de Stress Parental (2)</h2>
+<p class="card-instrument">PSI — Parenting Stress Index (versão adaptada)</p>
+<div class="card-spacer"></div>
+<!-- TODO: inserir link -->
+<a aria-label="Abrir Escala de Stress Parental 2" class="card-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeSpfL_wrXX_wZi8hQgadJlBapocLBj5NT2AxONO68nHUlTkQ/viewform?usp=dialog" rel="noopener noreferrer" target="_blank">Abrir</a>
+</article>
+<!-- 5 -->
+
+<!-- 6 -->
+<article class="card" role="listitem">
+<h2 class="card-title">Folha de Perfil — SGS II</h2>
+<p class="card-instrument">Teste de Avaliação do Desenvolvimento (Schedule of Growing Skills II)</p>
+<div class="card-spacer"></div>
+<!-- TODO: inserir link -->
+<a aria-label="Abrir Folha de Perfil SGS II" class="card-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeecBy4x9lKP8fmTVV_hTUpAjnAeS6qsFnOtnty_U1Nhn6dUw/viewform?usp=dialog" rel="noopener noreferrer" target="_blank">Abrir</a>
+</article>
+<!-- 7 -->
+<article class="card" role="listitem">
+<h2 class="card-title">GAS</h2>
+<p class="card-instrument">Goal Attainment Scaling</p>
+<div class="card-spacer"></div>
+<!-- TODO: inserir link -->
+<a aria-label="Abrir GAS — Goal Attainment Scaling" class="card-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfGF4SyRIbE9rLgjsjXZyOa1IKQE8NcBjU77vLRsfdLTaJd6w/viewform?usp=dialog" rel="noopener noreferrer" target="_blank">Abrir</a>
+</article>
+<!-- 8 -->
+<article class="card" role="listitem">
+<h2 class="card-title">LUI — Português</h2>
+<p class="card-instrument">Language Use Inventory</p>
+<div class="card-spacer"></div>
+<!-- TODO: inserir link -->
+<a aria-label="Abrir LUI — Language Use Inventory" class="card-btn" href="https://docs.google.com/forms/d/1vTjBzJ0ojRRPMqlwSoXGvkvsQi3NxY551OsQkm137I4/edit?usp=forms_home&amp;ouid=102511506153816395429&amp;ths=true" rel="noopener noreferrer" target="_blank">Abrir</a>
+</article>
+<!-- 9 -->
+
+<!-- 10 -->
+<article class="card" role="listitem">
+<h2 class="card-title">WHOQOL-Bref Portugal</h2>
+<p class="card-instrument">WHO Quality of Life — versão breve</p>
+<div class="card-spacer"></div>
+<!-- TODO: inserir link -->
+<a aria-label="Abrir WHOQOL-Bref Portugal" class="card-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSevc43gnAubeIpG9ODGotA4LFGmElzvvTWSzG0mMLPUWxSJeg/viewform?usp=dialog" rel="noopener noreferrer" target="_blank">Abrir</a>
+</article>
+<article class="card" role="listitem">
+<h2 class="card-title">Questionário Sociodemográfico e Obstétrico</h2>
+<p class="card-instrument">Caracterização sociodemográfica e obstétrica</p>
+<div class="card-spacer"></div>
+<a aria-label="Abrir Questionário Sociodemográfico e Obstétrico" class="card-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdeTnnPares6-DhKC9oTUy4v7S5NupaxlqSOGotFpgNGce8yg/viewform?usp=dialog" rel="noopener noreferrer" target="_blank">Abrir</a>
+</article>
+</div>
+</section>
+<p aria-hidden="true" class="page-footer">NODUS · 2025</p>
+</div>
+<script>
+/* ── Acesso encriptado ─────────────────────────────────────────────
+   A palavra-passe em texto NUNCA está no ficheiro — só um hash SHA-256
+   com sal. A página calcula o hash do que é escrito e compara. Quem lê o
+   código-fonte vê apenas o hex, que não se reverte para a palavra.
+   Nota: proteção client-side afasta curiosos, não é segurança forte. */
+(function(){
+  const SALT='nodus-forms::';
+  const HASH='411d1f76db38aa8b9f5d0564ec27827305cc38302148c8149983dd9d8b9f92d6';
+  const lock=document.getElementById('lock'),
+        pw=document.getElementById('pw'),
+        btn=document.getElementById('pwBtn'),
+        err=document.getElementById('lockErr'),
+        card=document.getElementById('lockCard');
+
+  try{ if(sessionStorage.getItem('nodus_ok')==='1'){ lock.classList.add('hidden'); } }catch(e){}
+
+  async function sha256(str){
+    if(window.crypto && crypto.subtle){
+      const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+    }
+    return sha256js(str);
+  }
+  function sha256js(ascii){
+    function rr(v,a){return (v>>>a)|(v<<(32-a));}
+    const K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+    let h0=0x6a09e667,h1=0xbb67ae85,h2=0x3c6ef372,h3=0xa54ff53a,h4=0x510e527f,h5=0x9b05688c,h6=0x1f83d9ab,h7=0x5be0cd19;
+    const bytes=[];for(let i=0;i<ascii.length;i++){let c=ascii.charCodeAt(i);
+      if(c<128)bytes.push(c);else if(c<2048){bytes.push(192|(c>>6),128|(c&63));}
+      else{bytes.push(224|(c>>12),128|((c>>6)&63),128|(c&63));}}
+    const l=bytes.length;bytes.push(0x80);while((bytes.length%64)!==56)bytes.push(0);
+    const bl=l*8;for(let i=7;i>=0;i--)bytes.push((bl/Math.pow(2,i*8))&0xff);
+    const w=new Int32Array(64);
+    for(let j=0;j<bytes.length;j+=64){
+      for(let i=0;i<16;i++)w[i]=(bytes[j+i*4]<<24)|(bytes[j+i*4+1]<<16)|(bytes[j+i*4+2]<<8)|(bytes[j+i*4+3]);
+      for(let i=16;i<64;i++){const s0=rr(w[i-15],7)^rr(w[i-15],18)^(w[i-15]>>>3);const s1=rr(w[i-2],17)^rr(w[i-2],19)^(w[i-2]>>>10);w[i]=(w[i-16]+s0+w[i-7]+s1)|0;}
+      let a=h0,b=h1,c=h2,d=h3,e=h4,f=h5,g=h6,hh=h7;
+      for(let i=0;i<64;i++){const S1=rr(e,6)^rr(e,11)^rr(e,25);const ch=(e&f)^((~e)&g);const t1=(hh+S1+ch+K[i]+w[i])|0;const S0=rr(a,2)^rr(a,13)^rr(a,22);const mj=(a&b)^(a&c)^(b&c);const t2=(S0+mj)|0;hh=g;g=f;f=e;e=(d+t1)|0;d=c;c=b;b=a;a=(t1+t2)|0;}
+      h0=(h0+a)|0;h1=(h1+b)|0;h2=(h2+c)|0;h3=(h3+d)|0;h4=(h4+e)|0;h5=(h5+f)|0;h6=(h6+g)|0;h7=(h7+hh)|0;
+    }
+    return [h0,h1,h2,h3,h4,h5,h6,h7].map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
+  }
+
+  async function tryUnlock(){
+    err.textContent='';
+    const val=pw.value;
+    if(!val){ fail('Escreve a palavra-passe.'); return; }
+    let h;
+    try{ h=await sha256(SALT+val); }
+    catch(e){ fail('Não foi possível verificar neste navegador.'); return; }
+    if(h===HASH){
+      try{ sessionStorage.setItem('nodus_ok','1'); }catch(e){}
+      lock.style.transition='opacity .35s';lock.style.opacity='0';
+      setTimeout(()=>{lock.classList.add('hidden');lock.style.opacity='';},350);
+    }else{
+      fail('Palavra-passe incorreta.'); pw.value=''; pw.focus();
+    }
+  }
+  function fail(msg){ err.textContent=msg; card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake'); }
+
+  btn.addEventListener('click',tryUnlock);
+  pw.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();tryUnlock();} });
+})();
+</script>
+</body>
+</html>
